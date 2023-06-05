@@ -1,38 +1,40 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+@media screen and (max-width: 480px) {
+  #headerImg {
+    width: 200px;
+    height: 200px; 
   }
 }
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+#headerImg{
+  width: 400px;
+  height: 400px;
+}
+.news-Item {
+  transition: box-shadow 0.3s, z-index 0.3s;
+}
+.news-Item :hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  z-index: 1;
+}
+.Header{
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
-
-.App-link {
-  color: #61dafb;
+.searchBar {
+  position: relative;
+  display: inline-block;
 }
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.searchBar input[type="search"] {
+  padding-right: 30px; /* Adjust this value based on the icon's width */
+  padding: 15px 300px 15px 10px;
+  border-radius: 30px;
+  border-color: rgb(105, 105, 105);
+  margin-top: 48px;
+}
+.searchBar .searchIcon {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  color: #6c6c6c;
+  margin-top: 24px;
 }
