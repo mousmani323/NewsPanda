@@ -7,11 +7,27 @@ import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 
 const News = (props) => {
   const [articles, setArticles] = useState([]);
-  const [filteredData , setFilteredData] = useState([])
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
+  const [filteredResults , setFilteredResults] = useState([])
+  const [searchInput, setSearchInput] = useState('');
   let parseData = [];
+
+  const handleChange = (e) => {
+    setSearchInput(e.target.value);
+  }
+  const searchItems = () => {
+    if (searchInput !== '') {
+        const filteredData = articles.filter((item) => {
+            return Object.values(item).join('').toLowerCase().includes(searchInput.toLowerCase())
+        })
+        setFilteredResults(filteredData)
+    }
+    else{
+        setFilteredResults(articles)
+    }
+}
 
   const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -25,9 +41,7 @@ const News = (props) => {
     let data = await fetch(url);
     let parseData = await data.json();
     props.setProgress(70);
-    // localStorage.setItem("parseData", JSON.stringify(parseData));
     setArticles(parseData.articles);
-    setFilteredData(parseData.articles);
     setTotalResults(parseData.totalResults);
     setLoading(false);
     props.setProgress(100);
@@ -50,18 +64,9 @@ const News = (props) => {
     let data = await fetch(url);
     parseData = await data.json();
     setArticles(articles.concat(parseData.articles));
-    setFilteredData(articles.concat(parseData.articles));
     setTotalResults(parseData.totalResults);
   };
-  const handleSearch =(e) => {
-    let value = e.target.previousSibling.value.toLowerCase();
-    console.log(value)
-    let result = [];
-    result = articles.filter((data) => {
-      return data.title.search(value) != -1;
-      });
-      setFilteredData(result);
-  }
+
 
   return (
     <>
@@ -79,18 +84,23 @@ const News = (props) => {
               type="search"
               placeholder="Search news"
               className="searchBar"
+              value={searchInput}
+              onChange={handleChange}
             />
-            <FontAwesomeIcon className="searchIcon" icon={faMagnifyingGlass} onClick={(e) =>handleSearch(e)}/>
+            <FontAwesomeIcon className="searchIcon" icon={faMagnifyingGlass} onClick={searchItems}/>
           </div>
         </div>
       </div>
+      {searchInput.length > 1 && filteredResults.length === 0 && (
+      <p>No news found for "{searchInput}"</p>
+    )}
 
-      {loading && <Spinner />}
+      {loading && filteredResults.length === 0 && <Spinner />}
       <InfiniteScroll
         dataLength={articles ? articles.length : 0}
         next={fetchMoreData}
         hasMore={totalResults !== (articles ? articles.length : 0)}
-        loader={<Spinner />}
+        loader={loading && filteredResults.length > 0 ? <Spinner /> : null}
         endMessage={
           <p style={{ textAlign: "center" }}>
             <b>--You have reached the end--</b>
@@ -99,8 +109,22 @@ const News = (props) => {
       >
         <div className="container my-3">
           <div className="row">
-            {articles &&
-              articles.map((e) => {
+          {searchInput.length > 1 ?
+            filteredResults.map((e) => {
+              return (
+                <div className="col-md-4" key={e.url}>
+                  <NewsItem
+                    title={e.title}
+                    description={e.description}
+                    urlToImage={e.urlToImage}
+                    newsUrl={e.url}
+                    source={e.source}
+                    date={e.publishedAt}
+                    mode={props.mode}
+                  />
+                </div>
+              );
+            }): articles.map((e) => {
                 return (
                   <div className="col-md-4" key={e.url}>
                     <NewsItem
